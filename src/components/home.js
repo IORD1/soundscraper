@@ -1,15 +1,42 @@
 import { Buffer } from "buffer";
+import './home.css';
+import { useState } from "react";
+import Spinner from "./spinner";
 
 
 function Home() {
+    const [isLoading, setIsLoading] = useState(false);
+    const [fliped, setflipped] = useState(false);
+    const [name, setname] = useState("No Playlist");
+    const [data, setdata] = useState();
+    const [card, setcard] = useState([]);
+
 
     let accessToken = '';
     var client_id = '51b5fbb27b834a9ea885257f52c7864e';
     var client_secret = '381e9f785fab4e51902014f448caf1bc';
 
 
-
     function callit(){
+        setIsLoading(true);
+            let link = "";
+            let templink = document.getElementById("link").value;
+            if(templink === ""){
+                alert("Please Enter a Link")
+                setIsLoading(false);
+                return;
+
+            }
+            for(let i=templink.length-1; i>=0; i--){
+                if(templink[i] !== '/'){
+                    link += templink[i];
+                }else{
+                    break;
+                }
+            }
+            link = link.split("").reduce((acc, char) => char + acc, "");
+            // console.log(link);
+            // fetchProfile(accessToken,link);
 
             if(accessToken === ''){
                 console.log("token fetching");
@@ -26,53 +53,104 @@ function Home() {
                     const content = await rawResponse.json();
                   
                     accessToken = content.access_token;
-                    console.log(content.access_token);
-                  })();
+                    // console.log(content.access_token);
+                    fetchProfile(accessToken,link);
+
+                })();
+                
             }else{
                 console.log("Fething playlists")
-                // fetchProfile(accessToken);
+                fetchProfile(accessToken,link);
             }
-
-
-            //   http GET https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n \
+            // https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='.urlencode($yt_search).'&key=AIzaSyA-6Om9C4ynVH8PhB_H7y8Pz5nbZYX80f4
+            // https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='apple'&key=AIzaSyA-6Om9C4ynVH8PhB_H7y8Pz5nbZYX80f4
+            // AIzaSyA-6Om9C4ynVH8PhB_H7y8Pz5nbZYX80f4
+            //   http GET https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n \ 
             //   Authorization:'Bearer 1POdFZRZbvb...qqillRxMr2z'     
             // https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a
     }
 
-    async function fetchProfile(token) {
-        console.log(token);
+    async function fetchProfile(token,link) {
+        // console.log(token);
+        // console.log("https://api.spotify.com/v1/playlists/"+link);
 
-        const result = await fetch("https://api.spotify.com/v1/playlists/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a", {
+        const result = await fetch("https://api.spotify.com/v1/playlists/"+link, {
             method: "GET", headers: { Authorization: `Bearer ${token}` }
         });
     
         const playlist = await result.json();
-        console.log(playlist);
+        setname(playlist.name);
+        setdata(playlist);
+        // console.log(data);
+
+         
+
+        // setcard( playlist.tracks.items.map(item => {
+        //     // console.log(item.track.name)
+        //     return (<p>{item.track.name}</p>);
+        // }));
+        // document.getElementById("nameboximage").style.backgroundImage = "url(" + playlist.images[1].url + ")";
+        setflipped(true);
+        setIsLoading(false);
+
+        // document.getElementById("playbox").append(cards);
     }
 
+    function millisToMinutesAndSeconds(millis) {
+        var minutes = Math.floor(millis / 60000);
+        var seconds = ((millis % 60000) / 1000).toFixed(0);
+        return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    }
+  
 
   return (
     <div className="LoginHome">
-        <button onClick={()=>{callit()}}>Click</button>
-        <input type="radio" name="optionScreen" id="SignIn" hidden checked />
-            <input type="radio" name="optionScreen" id="SignUp" hidden />
-
-            <section>
+        {isLoading ? <Spinner /> : 
+            <div></div>
+        }
+        <section>
+            <p>https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a</p>
                 <div id="logo">
                     <img src="https://www.freepnglogos.com/uploads/spotify-logo-png/spotify-icon-marilyn-scott-0.png" alt="Spotify-Logo" width="50" />
                     <h1>Select a Playlist</h1>
                 </div>
 
                 <nav>
-                    <label for="SignIn">Sign In</label>
+                    <label>Paste the link of your public playlist</label>
                 </nav>
 
                 <form  id="SignInFormData">
-                    <input type="text" id="username" placeholder="Username"/>
-                    <input type="password" id="password" placeholder="Password"/>
-                    <button type="button">Sing In</button>
+                    <input type="text" id="link" placeholder="Play list link" disabled={isLoading}/>
+                    <button type="button" onClick={()=>{callit()}} disabled={isLoading}>Get Playlist</button>
                 </form>
+                {fliped ?
+                <div id="namebox">
+                    <div id="nameboxborder">
 
+                    <div id="nameboximage" style={{backgroundImage:"url(" + data.images[0].url + ")"}}></div>
+                    <p id="nameboxname">{name}</p> 
+                    </div>
+                </div>
+                 : <p></p>}
+                <div id="playboxwrapper">
+                <div id="filterit"></div>
+                <div id="playbox">
+                    {fliped ? <></> : <p id="nullmusic" hidden={false}>Enter playlist link to see music</p>}
+                    {data ? data.tracks.items?.map(item => {
+                        return <div> 
+                            <div id="musicbox">
+                                <div id="musicimage" style={{backgroundImage:"url(" + item.track.album.images[2].url + ")"}}></div>
+                                <div id="musictextbox">
+                                    <p id="musictextboxname">{item.track.name}</p>
+                                    <p id="musictextboxartist">{item.track.album.artists[0].name}</p>
+                                </div>
+                                <p id="musictime">{millisToMinutesAndSeconds(item.track.duration_ms)}</p>
+                                <div id="musicdownloadbox"></div>
+                            </div>
+                            </div>;
+                    }) : <></> }
+                </div>
+                </div>
           
 
             </section>
