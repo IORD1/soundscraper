@@ -2,7 +2,7 @@ import { Buffer } from "buffer";
 import './home.css';
 import { useState } from "react";
 import Spinner from "./spinner";
-
+import { ReactComponent as Downloadit } from './assests/downloadit.svg';
 
 function Home() {
     const [isLoading, setIsLoading] = useState(false);
@@ -68,7 +68,7 @@ function Home() {
             //   http GET https://api.spotify.com/v1/playlists/3cEYpjA9oz9GiPac4AsH4n \ 
             //   Authorization:'Bearer 1POdFZRZbvb...qqillRxMr2z'     
             // https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a
-    }
+    }       
 
     async function fetchProfile(token,link) {
         // console.log(token);
@@ -102,6 +102,10 @@ function Home() {
         return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
     }
   
+    function downloadQueue(songname , artist){
+        let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"'&key=AIzaSyA-6Om9C4ynVH8PhB_H7y8Pz5nbZYX80f4";
+        console.log(fetchurl);
+    }
 
   return (
     <div className="LoginHome">
@@ -145,7 +149,7 @@ function Home() {
                                     <p id="musictextboxartist">{item.track.album.artists[0].name}</p>
                                 </div>
                                 <p id="musictime">{millisToMinutesAndSeconds(item.track.duration_ms)}</p>
-                                <div id="musicdownloadbox"></div>
+                                <div id="musicdownloadbox" onClick={() => {downloadQueue(item.track.name,item.track.album.artists[0].name)}}><Downloadit fill='#1ed760' style={{ height: 30, width: 30 }} id="downloadit"/></div>
                             </div>
                             </div>;
                     }) : <></> }

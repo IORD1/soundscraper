@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=Manrope&display=swap');
 html {
 	color: #eee;
 }
 
 * {
-	font-family: "Gotham Rounded Book", "sans-serif";
+	font-family: 'Manrope', sans-serif;
 	padding: 0;
 	margin: 0;
 	box-sizing: border-box;
@@ -16,6 +17,7 @@ body {
 	display: grid;
 	place-content: center;
 	background: #eee;
+	font-family: 'Manrope', sans-serif;
 }
 
 section {
@@ -146,7 +148,7 @@ a {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	border: 3px solid #1ed760;
+	border: 3px solid #09411c;
 	padding: 5px 10px 5px 5px;
 	border-radius: 50px;
 	
@@ -185,9 +187,13 @@ a {
 #musicdownloadbox{
 	height:40px;
 	width: 40px;
-	background-color: rgb(101, 121, 90);
+	background-color: rgba(28, 29, 28, 0.596);
 	margin: auto 0px auto 5px;
 	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
 }
 
 #musictextbox{
