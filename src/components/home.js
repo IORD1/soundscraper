@@ -3,14 +3,18 @@ import './home.css';
 import { useState } from "react";
 import Spinner from "./spinner";
 import { ReactComponent as Downloadit } from './assests/downloadit.svg';
+// import { dlAudio } from "youtube-exec/src/types/audio";
+
+
+
 
 function Home() {
     const [isLoading, setIsLoading] = useState(false);
     const [fliped, setflipped] = useState(false);
     const [name, setname] = useState("No Playlist");
     const [data, setdata] = useState();
-    const [card, setcard] = useState([]);
-
+    const [isworking, setisworking] = useState(false);
+    // const [link, setLink] = useState();
 
     let accessToken = '';
     var client_id = '51b5fbb27b834a9ea885257f52c7864e';
@@ -105,6 +109,21 @@ function Home() {
     function downloadQueue(songname , artist){
         let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"'&key=AIzaSyA-6Om9C4ynVH8PhB_H7y8Pz5nbZYX80f4";
         console.log(fetchurl);
+        // setLink(fetchurl);
+        if(isworking){
+            alert("Music is getting downloaded");
+        }else{
+            setisworking(true);
+            loadingMusic(fetchurl);
+        }
+            
+
+    }
+
+    async function loadingMusic(){
+          
+
+        setisworking(false);
     }
 
   return (
