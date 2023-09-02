@@ -126,12 +126,17 @@ function Home() {
         setisworking(false);
     }
 
+    function coptyit(){
+        navigator.clipboard.writeText("https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a");
+    }
+
   return (
     <div className="LoginHome">
         {isLoading ? <Spinner /> : 
             <div></div>
         }
         <section>
+            <button onClick={()=>{coptyit()}}>copy</button>
             <p>https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a</p>
                 <div id="logo">
                     <img src="https://www.freepnglogos.com/uploads/spotify-logo-png/spotify-icon-marilyn-scott-0.png" alt="Spotify-Logo" width="50" />
