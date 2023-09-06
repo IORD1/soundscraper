@@ -5,7 +5,7 @@ import Spinner from "./spinner";
 import { ReactComponent as Downloadit } from './assests/downloadit.svg';
 // import { dlAudio } from "youtube-exec/src/types/audio";
 
-
+const API_BASE = "https://localhost:3001";
 
 
 function Home() {
@@ -114,17 +114,39 @@ function Home() {
             alert("Music is getting downloaded");
         }else{
             setisworking(true);
-            loadingMusic(fetchurl);
+            console.log("calling rfunction");
+            loadingMusic();
         }
             
 
     }
 
-    async function loadingMusic(){
+    // function loadingMusic(){
           
 
+    //     setisworking(false);
+    // }
+
+
+    const loadingMusic = async (e) => {
+        e.preventDefault();
+        let data = await fetch(API_BASE + "/downloadit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            "url" : "hellow"
+          }),
+        });
+    
         setisworking(false);
-    }
+
+
+      };
+
+
+
 
     function coptyit(){
         navigator.clipboard.writeText("https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a");
