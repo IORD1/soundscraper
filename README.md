@@ -5,8 +5,7 @@
 
 preview:
 
-![22shots_so](https://github.com/IORD1/soundscraper/assets/91962775/48d1a42c-0494-4fae-89eb-2433222f8c89)
-
+![22shots_so](https://github.com/IORD1/soundscraper/assets/91962775/1f139983-2de5-47df-b08b-09b48b3f8d84)
 
 
 # Getting Started with Create React App
