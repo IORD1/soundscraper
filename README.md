@@ -1,3 +1,14 @@
+# SoundScrapper
+### A application to access spotify playlist music
+##### !Built for only educational purpose and does not motivates unautorized access to copyrighted music
+# 
+
+preview:
+
+![22shots_so](https://github.com/IORD1/soundscraper/assets/91962775/48d1a42c-0494-4fae-89eb-2433222f8c89)
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
