@@ -7,7 +7,6 @@ import { ReactComponent as Downloadit } from './assests/downloadit.svg';
 
 const API_BASE = "https://localhost:3001";
 
-
 function Home() {
     const [isLoading, setIsLoading] = useState(false);
     const [fliped, setflipped] = useState(false);
@@ -17,8 +16,11 @@ function Home() {
     // const [link, setLink] = useState();
 
     let accessToken = '';
-    var client_id = '51b5fbb27b834a9ea885257f52c7864e';
-    var client_secret = '381e9f785fab4e51902014f448caf1bc';
+    // var client_id = '51b5fbb27b834a9ea885257f52c7864e';
+    const client_id = process.env.SPOT_CLIENT_ID;
+    console.log(client_id);
+    console.log(process.env);
+    var client_secret = process.env.SPOT_SECRET_ID;
 
 
     function callit(){
@@ -107,7 +109,7 @@ function Home() {
     }
   
     function downloadQueue(songname , artist){
-        let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"'&key=AIzaSyA-6Om9C4ynVH8PhB_H7y8Pz5nbZYX80f4";
+        let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"&key="+process.env.YOU_TOKEN;
         console.log(fetchurl);
         // setLink(fetchurl);
         if(isworking){
@@ -187,7 +189,7 @@ function Home() {
                 <div id="playbox">
                     {fliped ? <></> : <p id="nullmusic" hidden={false}>Enter playlist link to see music</p>}
                     {data ? data.tracks.items?.map(item => {
-                        return <div> 
+                        return <div key={item.track.id}> 
                             <div id="musicbox">
                                 <div id="musicimage" style={{backgroundImage:"url(" + item.track.album.images[2].url + ")"}}></div>
                                 <div id="musictextbox">
