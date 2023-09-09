@@ -1,8 +1,23 @@
 const express = require('express');
 const cors = require('cors');
+const { dlAudio } = require("youtube-exec");
+// const ffmpeg = require('fluent-ffmpeg');
+// const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+// ffmpeg.setFfmpegPath(ffmpegPath);
+
+var FfmpegCommand = require('fluent-ffmpeg');
+var command = new FfmpegCommand();
+command.setFfmpegPath("/downloads");
+
+
+
+
+
+
 const app = express();
 app.use(express.json());
 app.use(cors());
+
 // var router = express.Router();
 
 
@@ -71,12 +86,27 @@ app.use(cors());
 
 // })
 
+async function downloaditmusic(link,name){
+    try {
+        await dlAudio({
+          url: link,
+          folder: "downloads", // optional, default: "youtube-exec"
+          filename: name, // optional, default: video title
+          quality: "lowest", // or "lowest"; default: "best"
+        });
+        console.log("Audio downloaded successfully! 🔊🎉");
+      } catch (err) {
+        console.error("An error occurred:", err.message);
+      }
+}
 
 
-
-app.post('/downloadit',async(req,res)=>{
+app.get('/downloadit',async(req,res)=>{
     console.log("-------------Fetching----------");
-    console.log(req.body);
+    // console.log(req.body);
+    const link = "https://www.youtube.com/watch?v=YXhZJ5JPuqs&pp=ygUTc2hvcnQgc2Vjb25kIHZlZGlvcw%3D%3D";
+    let name = "TempName";
+    downloaditmusic(link,name);
     // Jobs.find().then((data)=>{
     //     data=res.json(data)
     // }).then(()=>console.log(data))
