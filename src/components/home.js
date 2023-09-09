@@ -4,8 +4,8 @@ import { useState } from "react";
 import Spinner from "./spinner";
 import { ReactComponent as Downloadit } from './assests/downloadit.svg';
 // import { dlAudio } from "youtube-exec/src/types/audio";
-
-const API_BASE = "https://localhost:3001";
+import keys from ".//keys.json";
+const API_BASE = "http://localhost:3001";
 
 function Home() {
     const [isLoading, setIsLoading] = useState(false);
@@ -16,11 +16,8 @@ function Home() {
     // const [link, setLink] = useState();
 
     let accessToken = '';
-    // var client_id = '51b5fbb27b834a9ea885257f52c7864e';
-    const client_id = process.env.SPOT_CLIENT_ID;
-    console.log(client_id);
-    console.log(process.env);
-    var client_secret = process.env.SPOT_SECRET_ID;
+    const client_id = keys.SPOT_CLIENT_ID;
+    var client_secret = keys.SPOT_SECRET_ID;
 
 
     function callit(){
@@ -109,18 +106,28 @@ function Home() {
     }
   
     function downloadQueue(songname , artist){
-        let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"&key="+process.env.YOU_TOKEN;
+        let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"&key="+keys.YOU_TOKEN;
         console.log(fetchurl);
+
         // setLink(fetchurl);
         if(isworking){
             alert("Music is getting downloaded");
         }else{
-            setisworking(true);
+            // setisworking(true);
             console.log("calling rfunction");
-            loadingMusic();
+            getVedioLink(fetchurl);
         }
             
 
+    }
+
+    async function getVedioLink(fetchurl){
+        const vedioData = await fetch(fetchurl,{
+            method: "GET"
+        });
+        const dat = await vedioData.json();
+        // console.log(dat.items[0].id.videoId);
+        loadingMusic("https://www.youtube.com/watch?v="+dat.items[0].id.videoId)
     }
 
     // function loadingMusic(){
@@ -130,19 +137,19 @@ function Home() {
     // }
 
 
-    const loadingMusic = async (e) => {
-        e.preventDefault();
+    const loadingMusic = async (fetchurl) => {
+        // e.preventDefault();
         let data = await fetch(API_BASE + "/downloadit", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            "url" : "hellow"
+            url : fetchurl
           }),
         });
     
-        setisworking(false);
+        // setisworking(false);
 
 
       };
@@ -161,7 +168,6 @@ function Home() {
         }
         <section>
             <button onClick={()=>{coptyit()}}>copy</button>
-            <p>https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a</p>
                 <div id="logo">
                     <img src="https://www.freepnglogos.com/uploads/spotify-logo-png/spotify-icon-marilyn-scott-0.png" alt="Spotify-Logo" width="50" />
                     <h1>Select a Playlist</h1>

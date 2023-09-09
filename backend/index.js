@@ -74,7 +74,7 @@ app.use(cors());
 
 
 
-app.get('/downloadit',async(req,res)=>{
+app.post('/downloadit',async(req,res)=>{
     console.log("-------------Fetching----------");
     console.log(req.body);
     // Jobs.find().then((data)=>{

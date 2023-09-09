@@ -7,7 +7,7 @@
 .env
 # testing
 /coverage
-
+keys.json
 # production
 /build
 
