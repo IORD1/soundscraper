@@ -9,7 +9,8 @@ var FfmpegCommand = require('fluent-ffmpeg');
 var command = new FfmpegCommand();
 command.setFfmpegPath("/downloads");
 
-
+const fs = require('fs');
+const ytdl = require('ytdl-core');
 
 
 
@@ -90,14 +91,21 @@ async function downloaditmusic(link,name){
     try {
         await dlAudio({
           url: link,
-          folder: "downloads", // optional, default: "youtube-exec"
-          filename: name, // optional, default: video title
+          // folder: "downloads", // optional, default: "youtube-exec"
+          // filename: name, // optional, default: video title
           quality: "lowest", // or "lowest"; default: "best"
         });
         console.log("Audio downloaded successfully! 🔊🎉");
       } catch (err) {
         console.error("An error occurred:", err.message);
       }
+}
+async function ytdlDownloadMusic(link, name){
+  // ytdl(link)
+  // .pipe(fs.createWriteStream(name+'.mp4'));
+
+  const video = await ytdl(link, {filter: 'audioonly'});
+      video.pipe(fs.createWriteStream(name+".mp3"));
 }
 
 
@@ -107,9 +115,22 @@ app.get('/downloadit',async(req,res)=>{
     const link = "https://www.youtube.com/watch?v=YXhZJ5JPuqs&pp=ygUTc2hvcnQgc2Vjb25kIHZlZGlvcw%3D%3D";
     let name = "TempName";
     downloaditmusic(link,name);
-    // Jobs.find().then((data)=>{
-    //     data=res.json(data)
-    // }).then(()=>console.log(data))
+    // ytdlDownloadMusic(link,name);
+
+    // try{
+    //   const video = ytdl(link, {filter: 'audioonly'});
+    //   video.pipe(fs.createWriteStream(name+".mp3"));
+
+    // }catch(error){
+    //   console.log("---------here----------");
+    //   console.log(error);
+    // }
+
+
+
+
+
+ 
     const response = {"name" : "bozz"};
         // console.log('response', response)
     // res.send(response)
