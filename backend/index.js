@@ -1,147 +1,82 @@
 const express = require('express');
 const cors = require('cors');
 const { dlAudio } = require("youtube-exec");
-// const ffmpeg = require('fluent-ffmpeg');
-// const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-// ffmpeg.setFfmpegPath(ffmpegPath);
-
-var FfmpegCommand = require('fluent-ffmpeg');
-var command = new FfmpegCommand();
-command.setFfmpegPath("/downloads");
-
 const fs = require('fs');
 const ytdl = require('ytdl-core');
-
-
-
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// var router = express.Router();
+
+async function downloadAudio(url, name) {
+  try {
+    const downloadPath = "/home/iord/downloads"; // Replace with your download directory
+
+    // Use dlAudio for simplicity:
+    await dlAudio({
+      url: url,
+      quality: "lowest", // Adjust quality as needed
+      output: `${downloadPath}/${name}.mp3`,
+    });
+
+    console.log("Audio downloaded successfully!");
+
+  } catch (err) {
+    console.error("Error downloading audio:", err);
+  }
+}
 
 
 
 
-// app.post('/auth', async(req, res) => {
-//     // let userExists = false;
-//     // console.log("finding : " + req.body.username + " with password : " +req.body.password);
-
-//     // Auth.findOne({username : req.body.username})
-//     //             .then((userNameExist) => {
-//     //                 if(userNameExist){
-//     //                     console.log("username exists");
-//     //                     console.log(userNameExist.password);
-//     //                     if(userNameExist.password === req.body.password){
-//     //                         console.log("password matches ");
-//     //                         return res.status(200).json({code : 1,name : userNameExist.name, isRec : 0});
-                            
-//     //                     }else res.status(401).json({code : 0});
-//     //                 } 
-
-//     //             }).catch(err => {console.log(err);});
-
-//     // Recregistration.findOne({username : req.body.username})
-//     // .then((recruterExists) => {
-//     //     if(recruterExists){
-//     //         console.log("username exists");
-//     //         console.log(recruterExists.password);
-//     //         if(recruterExists.password === req.body.password){
-//     //             console.log("password matches ");
-//     //             return res.status(200).json({code : 1,name : recruterExists.name,isRec : 1});
-
-//     //         }else res.status(401).json({code : 0});
-//     //     } 
-
-//     // }).catch(err => {console.log(err);});
-    
-
-// });
 
 
-// app.post('/auth/register', (req, res) => {
+// app.post('/downloadit', async (req, res) => {
+//   console.log("-------------Fetching----------");
+//   console.log(req.body);
 
-//     const {username, password, name} = req.body;
-//     if(!username || !password || !name ){
-//         console.log("Please the Enter details");
-
-//         return res.status(422).json({code : 0});
-//     }
-
-//     Auth.findOne({username : username})
-//     .then((userExist) => {
-//         if(userExist){
-//             return res.status(422).json({code: 2, error : "Email alredy exist"})
-//         }
-
-//         const newUser = new Auth({username,password,name});
-//         console.log(newUser);
-        
-//         newUser.save();
-//         res.json(newUser);
-        
-//     }).catch(err => {console.log(err);});
-
-
-
+//   // const link = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+//   // const name = "secondRickRoll";
+//   downloadAudio(req.body.url, req.body.name);
+//   const response = { "name": "bozz" };
+//   res.send(JSON.stringify(response));
 // })
 
-async function downloaditmusic(link,name){
-    try {
-        await dlAudio({
-          url: link,
-          // folder: "downloads", // optional, default: "youtube-exec"
-          // filename: name, // optional, default: video title
-          quality: "lowest", // or "lowest"; default: "best"
-        });
-        console.log("Audio downloaded successfully! 🔊🎉");
-      } catch (err) {
-        console.error("An error occurred:", err.message);
-      }
-}
-async function ytdlDownloadMusic(link, name){
-  // ytdl(link)
-  // .pipe(fs.createWriteStream(name+'.mp4'));
 
-  const video = await ytdl(link, {filter: 'audioonly'});
-      video.pipe(fs.createWriteStream(name+".mp3"));
-}
+app.post('/downloadit', async (req, res) => {
+  console.log("-------------Fetching----------");
+  console.log(req.body);
 
+  try {
+    await downloadAudio(req.body.url, req.body.name);
+    console.log("Download complete!");
 
-app.get('/downloadit',async(req,res)=>{
-    console.log("-------------Fetching----------");
-    // console.log(req.body);
-    const link = "https://www.youtube.com/watch?v=YXhZJ5JPuqs&pp=ygUTc2hvcnQgc2Vjb25kIHZlZGlvcw%3D%3D";
-    let name = "TempName";
-    downloaditmusic(link,name);
-    // ytdlDownloadMusic(link,name);
+    const response = { 
+      name: req.body.name,
+      downloadComplete: true, 
+    };
+    res.json(response);
+  } catch (error) {
+    console.error("Error during download:", error);
 
-    // try{
-    //   const video = ytdl(link, {filter: 'audioonly'});
-    //   video.pipe(fs.createWriteStream(name+".mp3"));
+    const response = {
+      name: req.body.name,
+      downloadComplete: false, 
+    };
+    res.status(500).json(response);
+  }
+});
 
-    // }catch(error){
-    //   console.log("---------here----------");
-    //   console.log(error);
-    // }
+app.get('/hi', (req, res)=>{
+
+  console.log("Hi called")
+  const response = { "name": "bozz" };
+  
+  res.send(JSON.stringify(response));
+}) 
 
 
-
-
-
- 
-    const response = {"name" : "bozz"};
-        // console.log('response', response)
-    // res.send(response)
-    res.send(response);
-})
-
-
-
-
-
-
-app.listen(3001, ()=> {
-    console.log("Server started on port 3001");
+app.listen(3001, () => {
+  console.log("Server started on port 3001");
 })

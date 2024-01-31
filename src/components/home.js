@@ -2,7 +2,12 @@ import { Buffer } from "buffer";
 import './home.css';
 import { useState } from "react";
 import Spinner from "./spinner";
+
 import { ReactComponent as Downloadit } from './assests/downloadit.svg';
+import { ReactComponent as BeignDownloding } from './assests/progress.svg';
+import { ReactComponent as Downloaded } from './assests/downloadDone.svg';
+import { ReactComponent as Expand } from './assests/expand.svg';
+import { ReactComponent as Hiden } from './assests/hide.svg';
 // import { dlAudio } from "youtube-exec/src/types/audio";
 import keys from ".//keys.json";
 const API_BASE = "http://localhost:3001";
@@ -13,6 +18,10 @@ function Home() {
     const [name, setname] = useState("No Playlist");
     const [data, setdata] = useState();
     const [isworking, setisworking] = useState(false);
+    const [downloadingSongs, setDownloadingSongs] = useState([]);
+    const [downloadedSongs, setDownloadedSongs] = useState([]);
+    const [hide, setHide] = useState(false);
+
     // const [link, setLink] = useState();
 
     let accessToken = '';
@@ -105,51 +114,57 @@ function Home() {
         return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
     }
   
-    function downloadQueue(songname , artist){
+    function downloadQueue(songname , artist, id){
         let fetchurl =  "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&order=relevance&q='"+ songname+ " by "+ artist +"&key="+keys.YOU_TOKEN;
         console.log(fetchurl);
-
+        
         // setLink(fetchurl);
-        if(isworking){
-            alert("Music is getting downloaded");
-        }else{
-            // setisworking(true);
-            console.log("calling rfunction");
-            getVedioLink(fetchurl);
+        // if(isworking){
+        //     alert("Music is getting downloaded");
+        // }else{
+        //     // setisworking(true);
+        //     console.log("calling rfunction");
+        //     getVedioLink(fetchurl);
+        // }
+
+        if (downloadingSongs.includes(id)) {
+            alert("Music is already being downloaded");
+        } else {
+            setDownloadingSongs((prevSongs) => [...prevSongs, id]);
+            console.log("calling function");
+            getVedioLink(fetchurl, id);
+            console.log(downloadingSongs);
         }
             
 
     }
 
-    async function getVedioLink(fetchurl){
+    async function getVedioLink(fetchurl, id){
         const vedioData = await fetch(fetchurl,{
             method: "GET"
         });
         const dat = await vedioData.json();
-        // console.log(dat.items[0].id.videoId);
-        loadingMusic("https://www.youtube.com/watch?v="+dat.items[0].id.videoId)
+        loadingMusic("https://www.youtube.com/watch?v="+dat.items[0].id.videoId, dat.items[0].snippet.title, id)
     }
 
-    // function loadingMusic(){
-          
-
-    //     setisworking(false);
-    // }
 
 
-    const loadingMusic = async (fetchurl) => {
-        // e.preventDefault();
+    const loadingMusic = async (fetchurl, nameOfSong, id) => {
         let data = await fetch(API_BASE + "/downloadit", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            url : fetchurl
+            url : fetchurl,
+            name: nameOfSong
           }),
         });
         
-        
+
+        console.log(data.body);
+        setDownloadingSongs((prevSongs) => prevSongs.filter((songId) => songId !== id));
+        setDownloadedSongs((prevSongs) => [...prevSongs, id])
         // setisworking(false);
 
 
@@ -162,19 +177,43 @@ function Home() {
         navigator.clipboard.writeText("https://open.spotify.com/playlist/6IRs4uMfjBzzI4ADvFagX8?si=5cab429ec262496a");
     }
 
+    function swapHide(){
+        if(hide){
+            setHide(false);
+            document.getElementById("playbox").style.height = "200px";
+
+        }else{
+            setHide(true);
+            document.getElementById("playbox").style.height = "400px";
+        }
+    }
+
   return (
     <div className="LoginHome">
         {isLoading ? <Spinner /> : 
             <div></div>
         }
         <section>
-            <button onClick={()=>{coptyit()}}>copy</button>
+            {/* <button onClick={()=>{coptyit()}}>copy</button> */}
                 <div id="logo">
                     <img src="https://www.freepnglogos.com/uploads/spotify-logo-png/spotify-icon-marilyn-scott-0.png" alt="Spotify-Logo" width="50" />
                     <h1>Select a Playlist</h1>
+                    <div
+                        id="musicdownloadbox"
+                        onClick={() => {
+                            swapHide();
+                        }}
+                        >
+                        {hide ? <Expand fill="#343541" style={{ height: 30, width: 30 }} id="downloadit" />
+                        : 
+                            <Hiden fill="#343541" style={{ height: 30, width: 30 }} id="downloadit" />
+                        }
+                    </div>
                 </div>
-
-                <nav>
+                {hide ? 
+                    <></>
+                :
+                    <>   <nav>
                     <label>Paste the link of your public playlist</label>
                 </nav>
 
@@ -190,10 +229,13 @@ function Home() {
                     <p id="nameboxname">{name}</p> 
                     </div>
                 </div>
-                 : <p></p>}
+                 : <p></p>}</>
+                }
+                    
+
                 <div id="playboxwrapper">
                 <div id="filterit"></div>
-                <div id="playbox">
+                <div id="playbox" >
                     {fliped ? <></> : <p id="nullmusic" hidden={false}>Enter playlist link to see music</p>}
                     {data ? data.tracks.items?.map(item => {
                         return <div key={item.track.id}> 
@@ -204,7 +246,18 @@ function Home() {
                                     <p id="musictextboxartist">{item.track.album.artists[0].name}</p>
                                 </div>
                                 <p id="musictime">{millisToMinutesAndSeconds(item.track.duration_ms)}</p>
-                                <div id="musicdownloadbox" onClick={() => {downloadQueue(item.track.name,item.track.album.artists[0].name)}}><Downloadit fill='#1ed760' style={{ height: 30, width: 30 }} id="downloadit"/></div>
+                                <div
+                                    id="musicdownloadbox"
+                                    onClick={() => {
+                                        downloadQueue(item.track.name, item.track.album.artists[0].name, item.track.id);
+                                    }}
+                                    style={{ cursor: downloadingSongs.includes(item.track.id) ? "not-allowed" : "pointer" }}
+                                    >
+                                    {downloadedSongs.includes(item.track.id) ? <Downloaded fill="#7e78ff" style={{ height: 30, width: 30 }} id="downloadit" />
+                                    : 
+                                        <>{downloadingSongs.includes(item.track.id) ? <BeignDownloding fill="#fad430" style={{ height: 30, width: 30 }} id="downloadit" className="spinIt" /> : <Downloadit fill="#1ed760" style={{ height: 30, width: 30 }} id="downloadit" />}</>
+                                    }
+                                </div>
                             </div>
                             </div>;
                     }) : <></> }
